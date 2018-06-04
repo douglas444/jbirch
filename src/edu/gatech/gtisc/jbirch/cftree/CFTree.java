@@ -610,24 +610,29 @@ public class CFTree {
 		System.out.println(Arrays.toString(v));
 	}
 	
-	/**
-	 * Prints the index of the pattern vectors in each leaf entry (i.e., each subcluster)
-	 */
-	public void printLeafEntries() {
-		int i=0;
+	public Map<Integer, Integer> getClusterMap() {
+
 		CFNode l = leafListStart.getNextLeaf();
+
+        Map<Integer, Integer> clusterByInstanceIndex = new HashMap<>();
+        
+        int cluster = 1;
+
 		while(l!=null) {
 			if(!l.isDummy()) {
 				for(CFEntry e : l.getEntries()) {
-					System.out.println("[[" + (++i) +"]]");
-					Integer[] v = e.getIndexList().toArray(new Integer[0]);
-					Arrays.sort(v);
-					System.out.println(Arrays.toString(v));
+                    Integer[] indexes = e.getIndexList().toArray(new Integer[0]);
+                    for (int i = 0; i < indexes.length; ++i) {
+                        clusterByInstanceIndex.put(indexes[i], cluster);
+                    }
+                    ++cluster;
 				}
 			}
 			
 			l = l.getNextLeaf();
 		}
+
+        return clusterByInstanceIndex;
 	}
 	
 }

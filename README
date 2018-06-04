@@ -25,7 +25,20 @@
 The code in net/sourceforge/sizeof/ is originally from
 http://sourceforge.net/projects/sizeof/
 
+=== HOWTO ===
 
-=== Using JBIRCH ===
-The TestX.java files should give you a good idea about how to use the code
+Create bin folder on the root
+
+Compile:
+javac -d bin -cp bin src/net/sourceforge/sizeof/*.java
+javac -d bin -cp bin src/edu/gatech/gtisc/jbirch/cftree/*.java
+javac -d bin -cp bin src/edu/gatech/gtisc/jbirch/test/*.java
+
+Execute Test1:
+java -cp bin edu.gatech.gtisc.jbirch.test.Test1 100 0.5 1 true dataset
+
+Execute Test2:
+java -cp bin edu.gatech.gtisc.jbirch.test.Test2 0.5 10 dataset
+
+
 

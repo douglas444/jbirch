@@ -26,7 +26,7 @@ package edu.gatech.gtisc.jbirch.test;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
-
+import java.io.PrintWriter;
 import edu.gatech.gtisc.jbirch.cftree.CFTree;
 
 /**
@@ -40,6 +40,7 @@ import edu.gatech.gtisc.jbirch.cftree.CFTree;
 public class Test1 {
 
 	public static void main(String[] args) throws Exception {
+
 		int maxNodeEntries = Integer.parseInt(args[0]);
 		double distThreshold = Double.parseDouble(args[1]);
 		int distFunction = Integer.parseInt(args[2]);
@@ -51,59 +52,45 @@ public class Test1 {
 		
 		BufferedReader in = new BufferedReader(new FileReader(datasetFile));
 		
-		String line = null;
-		while((line=in.readLine())!=null) {
-			String[] tmp = line.split("\\s");
+		String line = in.readLine();
+        int instanceIndex = 0;
+
+		while((line = in.readLine()) != null) {
+
+			String[] tmp = line.split(";");
 			
 			double[] x = new double[tmp.length];
 			for(int i=0; i<x.length; i++) {
 				x[i] = Double.parseDouble(tmp[i]);
 			}
 			
-			boolean inserted = birchTree.insertEntry(x);
+			boolean inserted = birchTree.insertEntry(x, instanceIndex++);
+
 			if(!inserted) {
 				System.err.println("NOT INSERTED!");
 				System.exit(1);
 			}
 		}
-		
-		System.out.println("*************************************************");
-		System.out.println("*************************************************");
-		birchTree.printCFTree();
-		System.out.println("*************************************************");
-		System.out.println("*************************************************");
-		
-		System.out.println("****************** LEAVES *******************");
-		birchTree.printLeafEntries();
-		System.out.println("****************** END *******************");
-		
-		// System.out.println("****************** INDEXES *******************");
-		// birchTree.printLeafIndexes();
-		// System.out.println("****************** END *******************");
-		System.out.println("Total CF-Nodes = " + birchTree.countNodes());
-		System.out.println("Total CF-Entries = " + birchTree.countEntries());
-		System.out.println("Total CF-Leaf_Entries = " + birchTree.countLeafEntries());
-		
-		
-		
-		CFTree oldTree = birchTree;
-		CFTree newTree = null;
-		double newThreshold = distThreshold;
-		for(int i=0; i<10; i++) {
-			newThreshold = oldTree.computeNewThreshold(oldTree.getLeafListStart(), distFunction, newThreshold);
-			System.out.println("new Threshold ["+i+"] = " + newThreshold);
+
+        in = new BufferedReader(new FileReader(datasetFile));
+        Map<Integer, Integer> clusterMap = birchTree.getClusterMap();
+        PrintWriter writer = new PrintWriter("clustering_result.csv", "UTF-8");
+        int index = 0;
+
+
+		line = in.readLine();
+        writer.print(line + ";" + "cluster_id\n");
+
+		while((line = in.readLine()) != null) {
+
+            writer.print(line + ";" + clusterMap.get(index++) + "\n");
 			
-			newTree = oldTree.rebuildTree(maxNodeEntries, newThreshold, distFunction, true, false);
-			System.out.println("Total CF-Nodes in new Tree["+i+"] = " + newTree.countNodes());
-			System.out.println("Total CF-Entries in new Tree["+i+"] = " + newTree.countEntries());
-			System.out.println("Total CF-Leaf_Entries in new Tree["+i+"] = " + newTree.countLeafEntries());	
-			System.out.println("Total CF-Leaf_Entries lambdaSS in new Tree["+i+"] = " + newTree.computeSumLambdaSquared());
-			
-			oldTree = newTree;
 			
 		}
+        writer.close();
 		
-		ArrayList<ArrayList<Integer>> members = newTree.getSubclusterMembers();
+		System.out.println("Total CF-Leaf_Entries = " + birchTree.countLeafEntries());
+		
 		
 	}
 	
